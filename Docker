@@ -2,8 +2,8 @@
 # Use the official Ubuntu 22.04 image as the base.
 FROM ubuntu:22.04
 
-# Set environment variables to allow non-interactive installation of packages.
-C
+#I am running in a non-interactive mode. Do not ask me any questions during installations; just use the default answers for everything."
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Update the package list and install all dependencies for both building and running:
 # curl (for NodeSource), Node.js (for building), and Nginx (for serving).
@@ -27,16 +27,16 @@ COPY . .
 # Build the React app for production. This creates a 'build' folder inside /app.
 RUN npm run build
 
-# Copy the built static files from the build directory to the Nginx web root.
-# We use 'cp' because we are in the same stage.
-RUN cp -r /app/build/* /var/www/html/
+# This command moves our finished React app from its build folder to the public-facing folder that Nginx uses.
 
-# Copy our custom Nginx configuration file to overwrite the default one.
+RUN cp -r /app/build/* /var/www/html/
+# We are replacing Nginx's generic rulebook with our own custom one, so the "waiter" knows how to handle our specific React app correctly (especially for routing).
+
 COPY nginx.conf /etc/nginx/sites-available/default
 
 # Expose port 80 to allow traffic to the Nginx server.
 EXPOSE 80
 
 # The command to start the Nginx server when the container launches.
-# 'daemon off;' is crucial for Docker as it keeps the process in the foreground.
+# 'daemon off;' "Stay in the foreground. Don't go to the background." By running in the foreground, Nginx becomes the life of the container, and as long as it's running, the container stays alive.
 CMD ["nginx", "-g", "daemon off;"]
