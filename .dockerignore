@@ -1,0 +1,13 @@
+# Ignore development dependencies, they will be installed inside the container.
+node_modules
+
+# Ignore the local production build folder, it will be generated inside the container.
+build
+
+# Ignore Docker files themselves.
+Dockerfile
+.dockerignore
+
+# Ignore git directory and npm logs.
+.git
+npm-debug.log
